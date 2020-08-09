@@ -1,0 +1,33 @@
+{
+  "name": "linqpalbackend",
+  "version": "1.0.0",
+  "description": "back end for linq pal app",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diopisemou/linqpalbackend.git"
+  },
+  "author": "bachir diop",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/diopisemou/linqpalbackend/issues"
+  },
+  "homepage": "https://github.com/diopisemou/linqpalbackend#readme",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-validator": "^6.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.28",
+    "mongoose-unique-validator": "^2.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
