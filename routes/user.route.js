@@ -11,7 +11,7 @@ const { check, validationResult } = require('express-validator');
 // User model
 let User = require('../models/user');
 
-// Add Student
+// Add User
 userRoute.route('/add-user').post(
     [
         check('first_name')
@@ -22,7 +22,7 @@ userRoute.route('/add-user').post(
         check('user_email', 'Email is required')
             .not()
             .isEmpty(),
-        check('snn', 'SSN is required')
+        check('ssn', 'SSN is required')
             .not()
             .isEmpty(),
         check('last_name', 'Last name must be at least 3 characters long')
@@ -31,7 +31,8 @@ userRoute.route('/add-user').post(
     ],
     (req, res, next) => {
         const errors = validationResult(req);
-        console.log(req.body);
+        //console.log(req.body);
+        console.log(errors);
 
         if (!errors.isEmpty()) {
             return res.status(422).jsonp(errors.array());
@@ -52,10 +53,13 @@ userRoute.route('/add-user').post(
                 user.save().then((response) => {
                     res.status(201).json({
                         message: "User successfully created!",
+                        sucesslogin: true,
                         result: response
                     });
                 }).catch(error => {
+                    console.log(error);
                     res.status(500).json({
+                        sucesslogin: false,
                         error: error
                     });
                 });
@@ -114,12 +118,13 @@ userRoute.route('/update-user/:id').put(authorize, (req, res, next) => {
 
 // Delete user
 userRoute.route('/delete-user/:id').delete(authorize, (req, res, next) => {
-  Student.findByIdAndRemove(req.params.id, (error, data) => {
+  User.findByIdAndRemove(req.params.id, (error, data) => {
     if (error) {
       return next(error);
     } else {
       res.status(200).json({
-        msg: data
+        msg: data,
+        sucessdelete: true,
       })
     }
   })

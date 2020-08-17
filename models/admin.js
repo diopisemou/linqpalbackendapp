@@ -26,7 +26,11 @@ let Admin = new Schema({
     },
     dob: {
       type: Date
+    },
+    gender: {
+      type: String
     }
+    
   }, {
     collection: 'admin'
   })

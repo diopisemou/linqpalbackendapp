@@ -20,6 +20,9 @@ let User = new Schema({
   },
   dob: {
     type: Date
+  },
+  gender: {
+    type: String
   }
 }, {
   collection: 'user'

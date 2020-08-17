@@ -9,7 +9,7 @@ const authorize = require("../middlewares/auth");
 const { check, validationResult } = require('express-validator');
 
 // Sign-up
-router.post("/register-user",
+router.post("/register-admin",
     [
         check('first_name')
             .not()
@@ -33,7 +33,7 @@ router.post("/register-user",
         }
         else {
             bcrypt.hash(req.body.admin_password, 10).then((hashpassword) => {
-                bcrypt.hash(req.body.admin_password, 10).then((hashssn) => {
+                bcrypt.hash(req.body.ssn, 10).then((hashssn) => {
                   const user = new adminSchema({
                     first_name: req.body.first_name,
                     admin_email: req.body.admin_email,
@@ -42,7 +42,7 @@ router.post("/register-user",
                   });
                   user.save().then((response) => {
                       res.status(201).json({
-                          message: "User successfully created!",
+                          message: "Admin successfully created!",
                           result: response
                       });
                   }).catch(error => {
@@ -103,6 +103,17 @@ router.route('/').get((req, res) => {
         }
     })
 })
+
+// Get all admins
+router.route('/admins').get(authorize, (req, res) => {
+    adminSchema.find((error, data) => {
+      if (error) {
+        return next(error)
+      } else {
+        res.json(data)
+      }
+    })
+  })
 
 // Get Single User
 router.route('/user-profile/:id').get(authorize, (req, res, next) => {
