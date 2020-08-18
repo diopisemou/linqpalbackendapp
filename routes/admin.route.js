@@ -21,6 +21,7 @@ router.post("/register-admin",
             .not()
             .isEmpty(),
         check('admin_email', 'Email already exist')
+            .not()
             .custom((value, { req }) =>  adminSchema.findOne( { admin_email: value }) == null ),        
         check('admin_password', 'Password should be between 5 to 8 characters long')
             .exists(true,true)

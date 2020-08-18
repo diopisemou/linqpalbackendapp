@@ -23,6 +23,7 @@ userRoute.route('/add-user').post(
             .not()
             .isEmpty(),
         check('user_email', 'Email already exist')
+            .not()
             .custom((value, { req }) =>  User.findOne( { user_email: value }) == null ),
         check('ssn', 'SSN is required')
             .not()
