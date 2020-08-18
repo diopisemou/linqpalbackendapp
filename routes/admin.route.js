@@ -8,7 +8,7 @@ const adminSchema = require("../models/Admin");
 const authorize = require("../middlewares/auth");
 const { check, validationResult } = require('express-validator');
 
-// Sign-up
+// Sign-up route to register a new admin
 router.post("/register-admin",
     [
         check('first_name')
@@ -27,15 +27,17 @@ router.post("/register-admin",
             .not()
             .isEmpty()
             .isLength({ min: 5, max: 12 })
-    ],
+    ], // We check here if mandatory fields are not empty and that email is unique
     (req, res, next) => {
         const errors = validationResult(req);
         console.log(errors);
 
+        // If there are errors in the validation we return errors
         if (!errors.isEmpty()) {
             return res.status(422).jsonp(errors.array());
         }
         else {
+            // If there is no errors then password is encrypted and new admin is saved
             bcrypt.hash(req.body.admin_password, 10).then((hashpassword) => {
                 bcrypt.hash(req.body.ssn, 10).then((hashssn) => {
                   const user = new adminSchema({
@@ -63,9 +65,10 @@ router.post("/register-admin",
     });
 
 
-// Sign-in
+// Sign-in route for admin user
 router.post("/signin", (req, res, next) => {
     let getUser;
+    // Default signin credentials for default admin user
     if (req.body.admin_email == "adminuser@linqpal.com" && req.body.admin_password == "123456789")  {
         let jwtToken = jwt.sign({
             admin_email: req.body.admin_email,
@@ -79,6 +82,7 @@ router.post("/signin", (req, res, next) => {
               _id: 0
           });
     } else {
+        // if email is different from default admin email then we check that user exists and that password is correct
         adminSchema.findOne({
             admin_email: req.body.admin_email
           }).then(user => {
@@ -114,7 +118,7 @@ router.post("/signin", (req, res, next) => {
     }
 });
 
-// Get Users
+// Get List of admins
 router.route('/').get((req, res) => {
     adminSchema.find((error, response) => {
         if (error) {
@@ -136,7 +140,7 @@ router.route('/admins').get(authorize, (req, res) => {
     })
   })
 
-// Get Single User
+// Get Single Admin
 router.route('/user-profile/:id').get(authorize, (req, res, next) => {
     adminSchema.findById(req.params.id, (error, data) => {
         if (error) {
@@ -149,7 +153,7 @@ router.route('/user-profile/:id').get(authorize, (req, res, next) => {
     })
 })
 
-// Update User
+// Update Admin
 router.route('/update-admin/:id').put((req, res, next) => {
     adminSchema.findByIdAndUpdate(req.params.id, {
         $set: req.body

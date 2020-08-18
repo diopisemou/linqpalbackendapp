@@ -11,7 +11,7 @@ const { check, validationResult } = require('express-validator');
 // User model
 let User = require('../models/user');
 
-// Add User
+// Add User to database
 userRoute.route('/add-user').post(
     [
         check('first_name')
@@ -22,22 +22,25 @@ userRoute.route('/add-user').post(
         check('user_email', 'Email is required')
             .not()
             .isEmpty(),
+        check('user_email', 'Email already exist')
+            .custom((value, { req }) =>  User.findOne( { user_email: value }) == null ),
         check('ssn', 'SSN is required')
             .not()
             .isEmpty(),
         check('last_name', 'Last name must be at least 3 characters long')
             .not()
             .isEmpty()
-    ],
+    ], // We check here if mandatory fields are not empty and that email is unique
     (req, res, next) => {
         const errors = validationResult(req);
         console.log(errors);
 
+        // If there are errors in the validation we return errors
         if (!errors.isEmpty()) {
             return res.status(422).jsonp(errors.array());
         }
         else {
-            
+            // If there is no errors then password is encrypted and new admin is saved
             bcrypt.hash(req.body.ssn, 10).then((hashssn) => {
 
                 const user = new User({
