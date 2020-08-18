@@ -31,7 +31,6 @@ userRoute.route('/add-user').post(
     ],
     (req, res, next) => {
         const errors = validationResult(req);
-        //console.log(req.body);
         console.log(errors);
 
         if (!errors.isEmpty()) {

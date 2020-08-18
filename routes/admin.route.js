@@ -16,17 +16,21 @@ router.post("/register-admin",
             .isEmpty()
             .isLength({ min: 3 })
             .withMessage('Name must be atleast 3 characters long'),
-        check('email', 'Email is required')
+        check('admin_email', 'Email is required')
+            .exists(true,true)
             .not()
             .isEmpty(),
-        check('password', 'Password should be between 5 to 8 characters long')
+        check('admin_email', 'Email already exist')
+            .custom((value, { req }) =>  adminSchema.findOne( { admin_email: value }) == null ),        
+        check('admin_password', 'Password should be between 5 to 8 characters long')
+            .exists(true,true)
             .not()
             .isEmpty()
-            .isLength({ min: 5, max: 8 })
+            .isLength({ min: 5, max: 12 })
     ],
     (req, res, next) => {
         const errors = validationResult(req);
-        console.log(req.body);
+        console.log(errors);
 
         if (!errors.isEmpty()) {
             return res.status(422).jsonp(errors.array());
@@ -36,6 +40,7 @@ router.post("/register-admin",
                 bcrypt.hash(req.body.ssn, 10).then((hashssn) => {
                   const user = new adminSchema({
                     first_name: req.body.first_name,
+                    last_name: req.body.last_name,
                     admin_email: req.body.admin_email,
                     admin_password: hashpassword,
                     ssn: hashssn,
@@ -43,10 +48,12 @@ router.post("/register-admin",
                   user.save().then((response) => {
                       res.status(201).json({
                           message: "Admin successfully created!",
+                          sucesslogin: true,
                           result: response
                       });
                   }).catch(error => {
                       res.status(500).json({
+                          sucesslogin: false,
                           error: error
                       });
                   });
@@ -143,7 +150,7 @@ router.route('/user-profile/:id').get(authorize, (req, res, next) => {
 })
 
 // Update User
-router.route('/update-user/:id').put((req, res, next) => {
+router.route('/update-admin/:id').put((req, res, next) => {
     adminSchema.findByIdAndUpdate(req.params.id, {
         $set: req.body
     }, (error, data) => {
@@ -158,17 +165,20 @@ router.route('/update-user/:id').put((req, res, next) => {
 })
 
 
-// Delete User
-router.route('/delete-user/:id').delete((req, res, next) => {
+
+
+// Delete user
+router.route('/delete-admin/:id').delete(authorize, (req, res, next) => {
     adminSchema.findByIdAndRemove(req.params.id, (error, data) => {
-        if (error) {
-            return next(error);
-        } else {
-            res.status(200).json({
-                msg: data
-            })
-        }
+      if (error) {
+        return next(error);
+      } else {
+        res.status(200).json({
+          msg: data,
+          sucessdelete: true,
+        })
+      }
     })
-})
+  })
 
 module.exports = router;
